@@ -57,25 +57,40 @@ const Login = () => {
     setLoading(true);
     
     try {
-      const response = await apiClient.post(API_ENDPOINTS.LOGIN, {
-        email: formData.email,
+      // 1. FIX: Send the correct payload structure expected by backend
+      const payload = {
+        usernameOrEmail: formData.email, // Backend expects 'usernameOrEmail'
         password: formData.password,
-      });
+      };
+
+      const response = await apiClient.post(API_ENDPOINTS.LOGIN, payload);
       
-      localStorage.setItem('authToken', response.data.token);
-      
-      if (response.data.user) {
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+      // 2. FIX: Access nested data correctly (response.data.data)
+      const { token, user } = response.data.data;
+
+      // Store Token & User
+      localStorage.setItem('authToken', token);
+      if (user) {
+        localStorage.setItem('user', JSON.stringify(user));
       }
       
+      // Handle "Remember Me"
       if (formData.rememberMe) {
         localStorage.setItem('rememberedEmail', formData.email);
       } else {
         localStorage.removeItem('rememberedEmail');
       }
       
-      navigate('/dashboard');
+      // 3. FIX: Check role and navigate accordingly
+      // Note: Backend returns 'Candidate' (capitalized), so match exactly or toLowerCase()
+      if (user?.role === 'Candidate' || user?.role === 'candidate') {
+        navigate('/candidate-profile');
+      } else {
+        navigate('/dashboard');
+      }
+
     } catch (error) {
+      console.error("Login Error:", error); // Debug log
       setApiError(
         error.response?.data?.message || 
         'Login failed. Please check your credentials and try again.'
@@ -84,6 +99,7 @@ const Login = () => {
       setLoading(false);
     }
   };
+
 
   const emailIcon = (
     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -133,13 +149,13 @@ const Login = () => {
               name="rememberMe"
               checked={formData.rememberMe}
               onChange={handleChange}
-              className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-2 focus:ring-orange-200 cursor-pointer"
+              className="w-4 h-4 rounded border-gray-300 text-primary  cursor-pointer"
             />
             <span className="ml-2 text-gray-700 text-sm">Remember Me</span>
           </label>
           <Link 
             to="/forgot-password" 
-            className="text-sm text-primary font-medium hover:text-orange-600 hover:underline transition-colors"
+            className="text-sm text-primary font-medium hover:text-primary-hover  transition-colors"
           >
             Forgot Password?
           </Link>
@@ -148,7 +164,7 @@ const Login = () => {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-primary hover:bg-orange-600 py-3 px-4 rounded-lg text-white font-semibold transition-all duration-200 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-primary hover:bg-primary-hover py-3 px-4 rounded-lg text-white font-semibold transition-all duration-200 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? (
             <span className="flex items-center justify-center">
@@ -167,7 +183,7 @@ const Login = () => {
           Don't have an account?{' '}
           <Link 
             to="/register" 
-            className="text-primary font-semibold hover:text-orange-600 hover:underline transition-colors"
+            className="text-primary font-semibold hover:text-primary-hover  transition-colors"
           >
             Create Account
           </Link>

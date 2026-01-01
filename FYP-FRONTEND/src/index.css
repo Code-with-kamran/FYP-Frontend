@@ -1,48 +1,62 @@
-/* src/index.css */
 @import "tailwindcss";
 
-/* Define your theme using CSS variables */
 @theme {
+  /* -- Primary Colors -- */
+  /* This automatically creates: bg-primary, text-primary, border-primary, ring-primary, etc. */
   --color-primary: #1960C8;
-  --color-primary-hover: #ea580c;
-  --color-secondary: #fb923c;
-  --color-light-bg: #fed7aa;
-  
-  /* Add custom colors to Tailwind's color palette */
-  --color-brand-orange: #f97316;
-  --color-brand-orange-dark: #ea580c;
-  --color-brand-orange-light: #fb923c;
+  --color-primary-hover: #144FA0;
+  --color-primary-light: #E3EFFF;
+  --color-primary-dark: #0D3A7A;
+
+  /* -- Success Colors -- */
+  --color-success: #10B981;
+  --color-success-hover: #059669;
+  --color-success-light: #D1FAE5;
+  --color-success-dark: #065F46;
+
+  /* -- Warning Colors -- */
+  --color-warning: #F59E0B;
+  --color-warning-hover: #D97706;
+  --color-warning-light: #FEF3C7;
+  --color-warning-dark: #92400E;
+
+  /* -- Danger Colors -- */
+  --color-danger: #EF4444;
+  --color-danger-hover: #DC2626;
+  --color-danger-light: #FEE2E2;
+  --color-danger-dark: #991B1B;
+
+  /* -- Info Colors -- */
+  --color-info: #3B82F6;
+  --color-info-hover: #2563EB;
+  --color-info-light: #DBEAFE;
+  --color-info-dark: #1E40AF;
+
+  /* -- Purple/Violet -- */
+  --color-purple: #8B5CF6;
+  --color-purple-hover: #7C3AED;
+  --color-purple-light: #EDE9FE;
+  --color-purple-dark: #5B21B6;
+
+  /* -- Secondary (Cyan) -- */
+  --color-secondary: #06B6D4;
+  --color-secondary-hover: #0891B2;
+  --color-secondary-light: #CFFAFE;
+
+  /* -- Brand Blue -- */
+  --color-brand-blue: #1960C8;
+  --color-brand-blue-dark: #1550a8;
+  --color-brand-blue-light: #3b82f6;
 }
 
-/* Custom utility classes */
-@layer utilities {
-  .text-primary {
-    color: var(--color-primary);
+/* Base styles are fine here, but consider putting font-family in @theme too */
+@layer base {
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+      sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
-  
-  .bg-primary {
-    background-color: var(--color-primary);
-  }
-  
-  .bg-primary-hover:hover {
-    background-color: var(--color-primary-hover);
-  }
-  
-  .border-primary {
-    border-color: var(--color-primary);
-  }
-  
-  .ring-primary {
-    --tw-ring-color: var(--color-primary);
-  }
-}
-
-/* Base styles */
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }

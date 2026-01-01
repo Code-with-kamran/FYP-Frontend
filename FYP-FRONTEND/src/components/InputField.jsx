@@ -30,10 +30,10 @@ const InputField = ({
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          className={`w-full px-4 py-3 pr-12 border rounded-lg focus:outline-none focus:ring-2 transition-all ${
+          className={`w-full px-4 py-3 pr-12 border rounded-lg focus:outline-none  transition-all ${
             error 
               ? 'border-red-500 focus:ring-red-200' 
-              : 'border-gray-300 focus:ring-orange-200 focus:border-orange-500'
+              : 'border-gray-300 focus:ring-0 focus:ring-primary focus:border-primary'
           }`}
         />
         

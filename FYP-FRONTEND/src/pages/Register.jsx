@@ -10,7 +10,7 @@ const Register = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     fullName: '',
-    username: '',      // ✅ Add username field
+    cnic: '',      // ✅ Add CNIC field
     email: '',
     password: '',
     confirmPassword: '',
@@ -42,12 +42,10 @@ const Register = () => {
     }
 
     // ✅ Add username validation
-    if (!formData.username.trim()) {
-      newErrors.username = 'Username is required';
-    } else if (formData.username.trim().length < 3) {
-      newErrors.username = 'Username must be at least 3 characters';
-    } else if (!/^[a-zA-Z0-9_]+$/.test(formData.username)) {
-      newErrors.username = 'Username can only contain letters, numbers, and underscores';
+   if (!formData.cnic) {
+      newErrors.cnic = 'CNIC is required';
+    } else if (!/^\d{13}$/.test(formData.cnic)) {
+      newErrors.cnic = 'CNIC must be exactly 13 digits (no dashes)';
     }
     
     if (!formData.email.trim()) {
@@ -89,7 +87,7 @@ const Register = () => {
   try {
     const payload = {
       FullName: formData.fullName,
-      Username: formData.username,
+      CNIC: formData.cnic,
       Email: formData.email,
       Password: formData.password,
       ConfirmPassword: formData.confirmPassword,
@@ -171,15 +169,15 @@ const Register = () => {
           required
         />
 
-        {/* ✅ Add Username Field */}
+        {/* ✅ Add CNIC Field */}
         <InputField
-          label="Username"
+          label="CNIC"
           type="text"
-          name="username"
-          value={formData.username}
+          name="cnic"
+          value={formData.cnic}
           onChange={handleChange}
-          placeholder="Choose a username"
-          error={errors.username}
+          placeholder="Enter your CNIC (Without dashes)"
+          error={errors.cnic}
           icon={userIcon}
           required
         />
@@ -225,15 +223,15 @@ const Register = () => {
               name="agreeToTerms"
               checked={formData.agreeToTerms}
               onChange={handleChange}
-              className="w-4 h-4 mt-1 rounded border-gray-300 text-orange-500 focus:ring-2 focus:ring-orange-200 cursor-pointer"
+              className="w-4 h-4 mt-1 rounded border-gray-300 text-primary focus:ring-2 focus:ring-orange-200 cursor-pointer"
             />
             <span className="ml-2 text-gray-700 text-sm">
               I agree to the{' '}
-              <Link to="/terms" className="text-orange-500 font-medium hover:underline">
+              <Link to="/terms" className="text-primary font-medium hover:text-primary-hover ">
                 Terms and Conditions
               </Link>
               {' '}and{' '}
-              <Link to="/privacy" className="text-orange-500 font-medium hover:underline">
+              <Link to="/privacy" className="text-primary font-medium hover:text-primary-hover S">
                 Privacy Policy
               </Link>
             </span>
@@ -244,7 +242,7 @@ const Register = () => {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-orange-500 hover:bg-orange-600 py-3 px-4 rounded-lg text-white font-semibold transition-all duration-200 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-primary hover:bg-primary-hover py-3 px-4 rounded-lg text-white font-semibold transition-all duration-200 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? (
             <span className="flex items-center justify-center">
@@ -263,7 +261,7 @@ const Register = () => {
           Already have an account?{' '}
           <Link 
             to="/login" 
-            className="text-orange-500 font-semibold hover:text-orange-600 hover:underline transition-colors"
+            className="text-primary font-semibold hover:text-primary-hover transition-colors"
           >
             Sign In
           </Link>

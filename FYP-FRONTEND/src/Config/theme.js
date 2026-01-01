@@ -9,12 +9,7 @@ export const themeColors = {
   lightBg: '#FED7AA',
 };
 
-// Base URL for backend API
-// ❌ OLD (causes error):
-// export const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'https://localhost:7001/api';
-
-// ✅ NEW (Vite syntax):
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://localhost:7103/api';
+export const API_BASE_URL = 'https://localhost:7103/api';
 
 // API Endpoints
 export const API_ENDPOINTS = {
@@ -23,4 +18,11 @@ export const API_ENDPOINTS = {
   FORGOT_PASSWORD: '/auth/forgot-password',
   RESET_PASSWORD: '/auth/reset-password',
   VERIFY_EMAIL: '/auth/verify-email',
+  ME:'Candidates/me',
+  JOBS_LIST: '/Jobs',              // GET list
+  JOBS_CREATE: '/Jobs/create-simple', // POST create
+  JOBS_UPDATE: (id) => `/Jobs/${id}`,
+  JOBS_DELETE: (id) => `/Jobs/${id}`, // DELETE
+  JOBS_STATUS: (id) => `/Jobs/${id}/status`,
+  FULL_JOBS_DETAIL: (id) => `/Jobs/get-full/${id}` 
 };

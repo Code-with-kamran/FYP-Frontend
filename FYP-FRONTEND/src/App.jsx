@@ -1,29 +1,39 @@
-// src/App.jsx
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import ForgotPassword from './pages/ForgotPassword';
-import ResetPassword from './pages/ResetPassword';
+import { Toaster } from 'react-hot-toast';
+import DashboardLayout from './components/DashboardLayout';
+import Dashboard from './pages/Dashboard';
+import RoleManagement from './pages/RoleManagement';
+import RecruiterProfile from './pages/RecruiterProfile';
+import CandidateProfile from './pages/CandidateProfile';
+import CVUpload from './pages/CVUpload';
+import JobsPage from './pages/JobsPage';
+import Login from './pages/Login'; // Assuming Login exists or will be created, keeping it safe
+import Register from './pages/Register'; // Assuming Register exists or will be created, keeping it safe
+import ForgotPassword from './pages/ForgotPassword'; // Assuming Register exists or will be created, keeping it safe
+import ResetPassword from './pages/ResetPassword'; // Assuming Register exists or will be created, keeping it safe
+import JobDetailPage from './pages/JobDetailPage'; // Assuming Register exists or will be created, keeping it safe
 
 function App() {
   return (
     <BrowserRouter>
+      <Toaster position="top-right" />
       <Routes>
-        {/* Default redirect to login */}
-        <Route path="/" element={<Navigate to="/login" replace />} />
-        
-        {/* Auth routes */}
+        <Route path="/" element={<DashboardLayout />}>
+          <Route index element={<Navigate to="/login" replace />} />
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="jobspage" element={<JobsPage />} />
+          <Route path="roles" element={<RoleManagement />} />
+          <Route path="recruiter-profile" element={<RecruiterProfile />} />
+          <Route path="candidate-profile" element={<CandidateProfile />} />
+          <Route path="cv-upload" element={<CVUpload />} />
+          <Route path="/jobDetails/:id" element={<JobDetailPage />} />    
+        </Route>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-        
-        {/* Protected routes - add later */}
-        {/* <Route path="/dashboard" element={<Dashboard />} /> */}
-        
-        {/* 404 - Not Found */}
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        <Route path="/Forgot-password" element={<ForgotPassword />} />
+        <Route path="/ResetPassword" element={<ResetPassword />} />
+
       </Routes>
     </BrowserRouter>
   );
