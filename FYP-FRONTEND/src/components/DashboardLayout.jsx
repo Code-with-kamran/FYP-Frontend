@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { FaHome, FaUsers, FaUserTie, FaUser, FaSignOutAlt, FaBars, FaTimes, FaBriefcase } from 'react-icons/fa';
+import { FaHome, FaUsers, FaUserTie, FaUser, FaSignOutAlt, FaBars, FaTimes, FaBriefcase,FaQuestionCircle } from 'react-icons/fa';
 
 const DashboardLayout = () => {
   const location = useLocation();
@@ -42,6 +42,7 @@ const DashboardLayout = () => {
     { path: '/roles', icon: FaUsers, label: 'Role Management' },
     { path: '/recruiter-profile', icon: FaUserTie, label: 'Recruiter Profile' },
     { path: '/candidate-profile', icon: FaUser, label: 'Candidate Profile' },
+    { path: '/job-questions', icon: FaQuestionCircle, label: 'Job Questions' },
   ];
 
   return (

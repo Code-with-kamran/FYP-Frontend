@@ -13,9 +13,13 @@ import Register from './pages/Register'; // Assuming Register exists or will be 
 import ForgotPassword from './pages/ForgotPassword'; // Assuming Register exists or will be created, keeping it safe
 import ResetPassword from './pages/ResetPassword'; // Assuming Register exists or will be created, keeping it safe
 import JobDetailPage from './pages/JobDetailPage'; // Assuming Register exists or will be created, keeping it safe
+import JobQuestionPage from './pages/JobQuestionPage'; // Assuming Register exists or will be created, keeping it safe
+import { StyleSheetManager } from 'styled-components';
+
 
 function App() {
   return (
+    <StyleSheetManager shouldForwardProp={(prop) => prop !== 'grow' && prop !== 'allowOverflow' && prop !== 'button'}>
     <BrowserRouter>
       <Toaster position="top-right" />
       <Routes>
@@ -27,7 +31,8 @@ function App() {
           <Route path="recruiter-profile" element={<RecruiterProfile />} />
           <Route path="candidate-profile" element={<CandidateProfile />} />
           <Route path="cv-upload" element={<CVUpload />} />
-          <Route path="/jobDetails/:id" element={<JobDetailPage />} />    
+          <Route path="/jobDetails/:id" element={<JobDetailPage />} />   
+          <Route path="job-questions" element={<JobQuestionPage />} />
         </Route>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
@@ -36,6 +41,7 @@ function App() {
 
       </Routes>
     </BrowserRouter>
+    </StyleSheetManager>
   );
 }
 

@@ -1,163 +1,239 @@
-import React, { useState, useEffect } from 'react';
-import toast from 'react-hot-toast';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Plus, Search, Mail, User } from 'lucide-react';
+import apiClient from '../Config/apiClient';
+import { API_ENDPOINTS } from '../Config/theme';
 import Swal from 'sweetalert2';
-import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
-import Skeleton from '../components/Skeleton';
+import UserForm from '../components/UserForm';
+import RoleActions from '../components/RoleActions';
+import ReusableTable from '../components/ReusableTable'; // <--- Import your component
 
 const RoleManagement = () => {
-    const [loading, setLoading] = useState(true);
-    const [roles, setRoles] = useState([]);
+  const [users, setUsers] = useState([]); 
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState(null);
 
-    useEffect(() => {
-        // Simulate API fetch
-        const timer = setTimeout(() => {
-            setRoles([
-                { id: 1, name: 'Admin', description: 'Full access to all features', users: 3 },
-                { id: 2, name: 'Recruiter', description: 'Can post jobs and view candidates', users: 12 },
-                { id: 3, name: 'Candidate', description: 'Can apply for jobs', users: 150 },
-            ]);
-            setLoading(false);
-        }, 1500);
-        return () => clearTimeout(timer);
-    }, []);
+  // --- API Calls ---
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const response = await apiClient.get(API_ENDPOINTS.USERS_LIST);
+      
+      let data = [];
+      if (Array.isArray(response.data)) {
+        data = response.data;
+      } else if (response.data && Array.isArray(response.data.data)) {
+        data = response.data.data;
+      }
+      
+      setUsers(data);
+    } catch (error) {
+      console.error("Failed to fetch users", error);
+      Swal.fire('Error', 'Failed to load users', 'error');
+      setUsers([]); 
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const handleAdd = async () => {
-        const { value: name } = await Swal.fire({
-            title: 'Add New Role',
-            input: 'text',
-            inputLabel: 'Role Name',
-            inputPlaceholder: 'Enter role name',
-            showCancelButton: true,
-            confirmButtonColor: '#1960C8',
-            cancelButtonColor: '#d33',
-        });
+  useEffect(() => { fetchUsers(); }, []);
 
-        if (name) {
-            setRoles([...roles, { id: roles.length + 1, name, description: 'New Role', users: 0 }]);
-            Swal.fire({
-                title: 'Success!',
-                text: 'Role added successfully!',
-                icon: 'success',
-                confirmButtonColor: '#1960C8',
-            });
-        }
-    };
+ // In RoleManagement.jsx
 
-    const handleEdit = async (role) => {
-        const { value: newName } = await Swal.fire({
-            title: 'Edit Role',
-            input: 'text',
-            inputLabel: 'Role Name',
-            inputValue: role.name,
-            showCancelButton: true,
-            confirmButtonColor: '#1960C8',
-            cancelButtonColor: '#d33',
-        });
+const handleCreateOrUpdate = async (formData) => {
+  try {
+    if (editingUser) {
+      await apiClient.put(API_ENDPOINTS.USERS_UPDATE(editingUser.id), formData);
+      Swal.fire('Success', 'User updated successfully', 'success');
+    } else {
+      // Ensure the endpoint is correct. Usually it is just '/Users' for POST
+      await apiClient.post(API_ENDPOINTS.USERS_CREATE, formData);
+      Swal.fire('Success', 'User created successfully', 'success');
+    }
+    setIsModalOpen(false);
+    setEditingUser(null);
+    fetchUsers();
+  } catch (error) {
+    console.error("Operation failed", error);
+    
+    // --- EXTRACT SERVER ERROR MESSAGE ---
+    let errorMessage = 'Failed to save user';
+    
+    // Check if the server sent a specific validation error message
+    if (error.response && error.response.data) {
+      // Sometimes errors come as a string, sometimes as an object
+      if (typeof error.response.data === 'string') {
+        errorMessage = error.response.data;
+      } else if (error.response.data.title) {
+        errorMessage = error.response.data.title; // Standard ASP.NET error title
+      } else if (error.response.data.message) {
+        errorMessage = error.response.data.message;
+      }
+      
+      // If it's a validation errors object (e.g. Password too weak)
+      if (error.response.data.errors) {
+        const firstErrorKey = Object.keys(error.response.data.errors)[0];
+        errorMessage = error.response.data.errors[firstErrorKey][0];
+      }
+    }
 
-        if (newName) {
-            setRoles(roles.map(r => r.id === role.id ? { ...r, name: newName } : r));
-            Swal.fire({
-                title: 'Updated!',
-                text: 'Role name has been updated.',
-                icon: 'success',
-                confirmButtonColor: '#1960C8',
-            });
-        }
-    };
+    Swal.fire('Error', errorMessage, 'error');
+  }
+};
 
-    const handleDelete = (id) => {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to revert this!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, delete it!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                setRoles(roles.filter(role => role.id !== id));
-                Swal.fire({
-                    title: 'Deleted!',
-                    text: 'Role has been deleted.',
-                    icon: 'success',
-                    confirmButtonColor: '#1960C8',
-                });
-            }
-        });
-    };
 
-    return (
-        <div className="space-y-6">
-            <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-bold text-gray-800">Role Management</h2>
-                <button
-                    onClick={handleAdd}
-                    className="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-lg shadow-md flex items-center group"
-                >
-                    <FaPlus className="mr-2 transition-transform duration-300 group-hover:rotate-90" />
-                    Add New Role
-                </button>
-            </div>
+  const handleDelete = async (id) => {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: "This action cannot be undone.",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!'
+    });
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-300">
-                <table className="w-full text-left">
-                    <thead className="bg-gray-50 border-b border-gray-100">
-                        <tr>
-                            <th className="p-4 font-semibold text-gray-600">Role Name</th>
-                            <th className="p-4 font-semibold text-gray-600">Description</th>
-                            <th className="p-4 font-semibold text-gray-600">Active Users</th>
-                            <th className="p-4 font-semibold text-gray-600">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {loading ? (
-                            // Skeleton Rows
-                            [1, 2, 3].map((i) => (
-                                <tr key={i} className="border-b border-gray-50">
-                                    <td className="p-4"><Skeleton className="h-5 w-24" /></td>
-                                    <td className="p-4"><Skeleton className="h-5 w-48" /></td>
-                                    <td className="p-4"><Skeleton className="h-5 w-12" /></td>
-                                    <td className="p-4">
-                                        <div className="flex space-x-2">
-                                            <Skeleton className="h-8 w-16 rounded" />
-                                            <Skeleton className="h-8 w-16 rounded" />
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))
-                        ) : (
-                            roles.map((role) => (
-                                <tr key={role.id} className="border-b border-gray-50 hover:bg-blue-50 transition-all duration-200 hover:shadow-sm">
-                                    <td className="p-4 font-medium text-gray-800">{role.name}</td>
-                                    <td className="p-4 text-gray-600">{role.description}</td>
-                                    <td className="p-4 text-gray-600">{role.users}</td>
-                                    <td className="p-4">
-                                        <div className="flex space-x-2">
-                                            <button
-                                                onClick={() => handleEdit(role)}
-                                                className="text-blue-600 hover:text-blue-800 font-medium hover:underline transition-all duration-200 flex items-center hover:scale-105 group"
-                                            >
-                                                <FaEdit className="mr-1 transition-transform duration-200 group-hover:rotate-12" />
-                                                Edit
-                                            </button>
-                                            <button
-                                                onClick={() => handleDelete(role.id)}
-                                                className="text-red-600 hover:text-red-800 font-medium hover:underline transition-all duration-200 flex items-center hover:scale-105 group"
-                                            >
-                                                <FaTrash className="mr-1 transition-transform duration-200 group-hover:scale-110" />
-                                                Delete
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
-            </div>
+    if (result.isConfirmed) {
+      try {
+        await apiClient.delete(API_ENDPOINTS.USERS_DELETE(id));
+        Swal.fire('Deleted!', 'User has been removed.', 'success');
+        fetchUsers();
+      } catch (error) {
+        Swal.fire('Error', 'Failed to delete user', 'error');
+      }
+    }
+  };
+
+  const handleStatusChange = async (id, currentStatus) => {
+    try {
+      const newStatus = !currentStatus;
+      setUsers(prev => prev.map(u => u.id === id ? { ...u, isActive: newStatus } : u));
+      await apiClient.patch(API_ENDPOINTS.USERS_STATUS(id), { isActive: newStatus });
+      const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
+      Toast.fire({ icon: 'success', title: `User ${newStatus ? 'Activated' : 'Deactivated'}` });
+    } catch (error) {
+      Swal.fire('Error', 'Status update failed', 'error');
+      fetchUsers(); 
+    }
+  };
+
+  // --- Columns ---
+  const columns = [
+    {
+      name: 'Role Name / User',
+      selector: row => row.fullName,
+      sortable: true,
+      cell: row => (
+        <div className="py-2">
+          <div className="flex items-center gap-2 font-bold text-gray-800">
+            <User size={16} className="text-blue-500" />
+            {row.fullName}
+          </div>
+          <div className="text-xs text-gray-500 mt-0.5 ml-6 bg-gray-100 inline-block px-2 py-0.5 rounded">
+            {row.role}
+          </div>
         </div>
+      ),
+      grow: 2,
+    },
+    {
+      name: 'Description / Email',
+      selector: row => row.email,
+      sortable: true,
+      cell: row => (
+        <div className="flex items-center gap-2 text-gray-600">
+          <Mail size={14} />
+          {row.email}
+        </div>
+      ),
+      grow: 2,
+    },
+    {
+      name: 'Active Users',
+      selector: row => row.isActive,
+      sortable: true,
+      cell: row => (
+        <span className={`px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 ${
+          row.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+        }`}>
+          <span className={`w-2 h-2 rounded-full ${row.isActive ? 'bg-green-600' : 'bg-red-600'}`}></span>
+          {row.isActive ? 'Active' : 'Inactive'}
+        </span>
+      ),
+    },
+    {
+      name: 'Actions',
+      cell: row => (
+        <RoleActions 
+          user={row} 
+          onEdit={() => { setEditingUser(row); setIsModalOpen(true); }} 
+          onDelete={() => handleDelete(row.id)}
+          onStatusChange={() => handleStatusChange(row.id, row.isActive)}
+        />
+      ),
+      ignoreRowClick: true,
+      allowOverflow: true,
+      button: true,
+      width: '120px',
+    },
+  ];
+
+  const filteredItems = useMemo(() => {
+    if (!Array.isArray(users)) return [];
+    return users.filter(item => 
+      (item.fullName && item.fullName.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (item.email && item.email.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (item.role && item.role.toLowerCase().includes(searchQuery.toLowerCase()))
     );
+  }, [users, searchQuery]);
+
+  return (
+    <div className="min-h-screen bg-gray-50 text-gray-800 p-4 md:p-8 font-sans">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Role Management</h1>
+          <p className="text-gray-500 mt-1">Manage system users and access levels</p>
+        </div>
+        <button 
+          onClick={() => { setEditingUser(null); setIsModalOpen(true); }} 
+          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg shadow-md transition-all"
+        >
+          <Plus size={18} /> Add New User
+        </button>
+      </div>
+      
+      {/* Search */}
+      <div className="bg-white p-4 rounded-t-xl border-b border-gray-100">
+        <div className="relative w-full sm:w-72">
+          <input 
+            type="text" 
+            className="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" 
+            placeholder="Search users..." 
+            value={searchQuery} 
+            onChange={(e) => setSearchQuery(e.target.value)} 
+          />
+          <Search size={32} className="absolute inset-y-2 left-0 pl-3 flex items-center text-gray-400" />
+        </div>
+      </div>
+
+      {/* Reusable Table Component */}
+      <ReusableTable 
+        columns={columns} 
+        data={filteredItems} 
+        loading={loading} 
+      />
+
+      {/* Modal */}
+      {isModalOpen && (
+        <UserForm 
+          user={editingUser} 
+          onClose={() => setIsModalOpen(false)} 
+          onSubmit={handleCreateOrUpdate} 
+        />
+      )}
+    </div>
+  );
 };
 
 export default RoleManagement;

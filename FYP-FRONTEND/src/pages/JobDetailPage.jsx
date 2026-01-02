@@ -62,7 +62,7 @@ const JobDetailPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-bg-color text-text-color p-4 md:p-8 font-sans">
+    <div className="min-h-screen bg-bg-color text-text-color p-4 md:p-2 font-sans">
       {/* Top Navigation */}
       <button 
         onClick={() => navigate(-1)}

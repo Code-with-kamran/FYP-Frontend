@@ -10,6 +10,7 @@ import JobActions from '../components/JobActions';
 import JobQuestionModal from '../components/JobQuestionModal';
 import ReusableTable from '../components/ReusableTable'; // Import the new component
 
+
 const JobsPage = () => {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -197,12 +198,21 @@ const JobsPage = () => {
 
   return (
     <div className="min-h-screen  text-gray-800 p-4 md:p-8 font-sans">
+           {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-        <h1 className="text-3xl font-bold text-gray-900">Job Management</h1>
-        <button onClick={() => { setEditingJob(null); setIsJobModalOpen(true); }} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg shadow-md transition-all">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Job Management</h1>
+          <p className="text-gray-500 mt-1 text-sm">Manage your job postings and screening questions</p>
+        </div>
+        
+        <button 
+          onClick={() => { setEditingJob(null); setIsJobModalOpen(true); }} 
+          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg shadow-md transition-all"
+        >
           <Plus size={18} /> Create New Job
         </button>
       </div>
+
       
       <div className="bg-white p-4 rounded-t-xl border-b border-gray-100">
         <div className="relative w-full sm:w-72">
